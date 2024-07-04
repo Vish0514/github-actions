@@ -1,40 +1,27 @@
-name: CI/CD Pipeline
-
 on:
   push:
-    branches:
-      - main
+    branches: [ dev ]
+
 env:
   DEPLOY_DIR: /home/ubuntu/prod/
-  
+ 
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-
-      - name: Install dependencies
-        run: npm install
-
-      - name: Build React app
-        run: npm run build
-
-      - name: Archive production artifact
-        uses: actions/upload-artifact@v2
-        with:
-          name: build-artifact
-          path: build
-
-      - name: Deploy to EC2
-        uses: appleboy/ssh-action@master
-        with:
-          host: ec2-44-201-244-211.compute-1.amazonaws.com
-          username: ubuntu
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          script: |
-            ssh ubuntu@44.201.244.211 'mkdir -p $DEPLOY_DIR'
-            scp -r build/* ubuntu@44.201.244.211:$DEPLOY_DIR
-            ssh ubuntu@44.201.244.211 'pm2 restart my-app'
-
+    - uses: actions/checkout@v2
+    - name: Use Node.js 14.x to Build
+      uses: actions/setup-node@v2
+      with:
+        node-version: 14.x
+    - run: npm install
+    - run: CI=false npm run build
+    - name: ssh deploy on aws ec2
+      uses: easingthemes/ssh-deploy@v2.1.4
+      env:
+        SSH_PRIVATE_KEY: ${{ secrets.AWS_SECRET_KEY }}
+        REMOTE_HOST: 44.201.244.211
+        REMOTE_USER: ubuntu
+        REMOTE_PORT: 22
+        SOURCE: "build/"
+        TARGET: $DEPLOY_DIR
