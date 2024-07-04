@@ -51,10 +51,7 @@ jobs:
         uses: webfactory/ssh-agent@v0.5.3
         with:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
-
-      - name: Move previous build to backup and clean deploy directory
-        run: ssh $SSH_USER@$SSH_HOST "mv $DEPLOY_DIR/build $BACKUP_DIR && rm -rf $DEPLOY_DIR/build"
-
+          
       - name: Copy build artifacts to server
         run: scp -r build $SSH_USER@$SSH_HOST:$DEPLOY_DIR
 
