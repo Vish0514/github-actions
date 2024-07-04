@@ -34,9 +34,8 @@ jobs:
           username: ubuntu
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            ssh ubuntu@ec2-44-201-244-211.compute-1.amazonaws.com 'mkdir -p $DEPLOY_DIR'
-            scp -r build/* ubuntu@ec2-44-201-244-211.compute-1.amazonaws.com:$DEPLOY_DIR
-
-            # Restart your service (assuming using PM2)
-            ssh ubuntu@ec2-44-201-244-211.compute-1.amazonaws.com 'pm2 restart my-app'
+            mkdir -p $DEPLOY_DIR
+            cd build
+            mv * $DEPLOY_DIR
+            pm2 restart my-app
 
