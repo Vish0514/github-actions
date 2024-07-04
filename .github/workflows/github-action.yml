@@ -7,7 +7,7 @@ on:
 
 env:
   SSH_USER: ubuntu
-  SSH_HOST: 3.80.209.201
+  SSH_HOST: 44.201.244.211
   DEPLOY_DIR: /home/ubuntu/prod
   BACKUP_DIR: /home/ubuntu/backup
   SERVE_PORT: 3000
