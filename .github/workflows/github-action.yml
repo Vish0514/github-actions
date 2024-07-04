@@ -32,7 +32,7 @@ jobs:
         with:
           host: ec2-44-201-244-211.compute-1.amazonaws.com
           username: ubuntu
-          key: ${{ secrets.AWS_SECRET_KEY }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
             ssh ubuntu@ec2-44-201-244-211.compute-1.amazonaws.com 'mkdir -p $DEPLOY_DIR'
             scp -r build/* ubuntu@ec2-44-201-244-211.compute-1.amazonaws.com:$DEPLOY_DIR
