@@ -5,8 +5,6 @@ on:
     branches:
       - main
 env:
-  EC2_USERNAME: ubuntu
-  EC2_HOST: 44.201.244.211
   DEPLOY_DIR: /home/ubuntu/prod/
   
 jobs:
@@ -32,13 +30,13 @@ jobs:
       - name: Deploy to EC2
         uses: appleboy/ssh-action@master
         with:
-          host: $EC2_HOST
-          username: $EC2_USERNAME
+          host: 44.201.244.211
+          username: ubuntu
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            ssh -o StrictHostKeyChecking=no ubuntu@ip-172-31-84-241 'mkdir -p $DEPLOY_DIR'
-            scp -r -o StrictHostKeyChecking=no build/* ubuntu@ip-172-31-84-241:$DEPLOY_DIR
+            ssh -o StrictHostKeyChecking=no ubuntu@44.201.244.211 'mkdir -p $DEPLOY_DIR'
+            scp -r -o StrictHostKeyChecking=no build/* ubuntu@44.201.244.211:$DEPLOY_DIR
 
             # Restart your service (assuming using PM2)
-            ssh -o StrictHostKeyChecking=no ubuntu@ip-172-31-84-241 'pm2 restart my-app'
+            ssh -o StrictHostKeyChecking=no ubuntu@44.201.244.211 'pm2 restart my-app'
 
