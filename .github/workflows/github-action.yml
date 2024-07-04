@@ -46,20 +46,10 @@ jobs:
         with:
           name: build
           path: build/
-
-      - name: Set up SSH
-        uses: webfactory/ssh-agent@v0.5.3
-        with:
-          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
-          
-      - name: Copy build artifacts to server
-        run: scp -r build $SSH_USER@$SSH_HOST:$DEPLOY_DIR
-
+   
       - name: Install serve and start application
         run: |
-          ssh $SSH_USER@$SSH_HOST "
-            cd $DEPLOY_DIR/build &&
-            npm install serve &&
+            cd build 
+            npm install serve 
             tmux new-session -d -s serve_session 
-            './node_modules/.bin/serve -s . -p $SERVE_PORT'
-          "
+            './node_modules/.bin/serve -s . -p $SERVE_PORT'"
