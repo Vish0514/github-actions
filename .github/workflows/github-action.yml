@@ -1,12 +1,13 @@
-name: CI/CD
+name: CI/CD Pipeline
 
 on:
   push:
     branches:
       - main
+
 env:
   SSH_USER: ubuntu
-  SSH_HOST: 3.80.209.201
+  SSH_HOST: 44.201.244.211
   DEPLOY_DIR: /home/ubuntu/prod
   BACKUP_DIR: /home/ubuntu/backup
   SERVE_PORT: 3000
@@ -46,10 +47,23 @@ jobs:
         with:
           name: build
           path: build/
-   
+
+      - name: Set up SSH
+        uses: webfactory/ssh-agent@v0.5.3
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Move previous build to backup and clean deploy directory
+        run: ssh $SSH_USER@$SSH_HOST "mv $DEPLOY_DIR/build $BACKUP_DIR && rm -rf $DEPLOY_DIR/build"
+
+      - name: Copy build artifacts to server
+        run: scp -r build $SSH_USER@$SSH_HOST:$DEPLOY_DIR
+
       - name: Install serve and start application
         run: |
-            cd build 
-            npm install serve 
+          ssh $SSH_USER@$SSH_HOST "
+            cd $DEPLOY_DIR/build &&
+            npm install serve &&
             tmux new-session -d -s serve_session 
-            './node_modules/.bin/serve -s . -p $SERVE_PORT'"
+            './node_modules/.bin/serve -s . -p $SERVE_PORT'
+          "
