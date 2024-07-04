@@ -1,6 +1,6 @@
 on:
   push:
-    branches: [ dev ]
+    branches: main
 
 env:
   DEPLOY_DIR: /home/ubuntu/prod/
