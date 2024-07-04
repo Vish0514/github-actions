@@ -32,9 +32,9 @@ jobs:
         with:
           host: ec2-44-201-244-211.compute-1.amazonaws.com
           username: ubuntu
-          key: ${{ secrets.AWS_SECRET_KEY }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
             ssh ubuntu@44.201.244.211 'mkdir -p $DEPLOY_DIR'
-            scp -r ubuntu@44.201.244.211:$DEPLOY_DIR
+            scp -r build/* ubuntu@44.201.244.211:$DEPLOY_DIR
             ssh ubuntu@44.201.244.211 'pm2 restart my-app'
 
