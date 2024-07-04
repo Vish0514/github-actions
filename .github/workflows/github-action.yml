@@ -24,6 +24,16 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
+      - name: Set up SSH
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install openssh-client -y
+          eval $(ssh-agent -s)
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" | tr -d '\r' | ssh-add -
+          mkdir -p ~/.ssh
+          chmod 700 ~/.ssh
+          ssh-keyscan ${{ env.SSH_HOST }} >> ~/.ssh/known_hosts
+
       - name: Backup and clear deployment directory on server
         run: |
           ssh ${{ env.SSH_USER }}@${{ env.SSH_HOST }} "mkdir -p ${{ env.BACKUP_DIR }}/build_${{ env.BUILD_NUMBER }} && mv ${{ env.DEPLOY_DIR }}/build ${{ env.BACKUP_DIR }}/build_${{ env.BUILD_NUMBER }} && rm -rf ${{ env.DEPLOY_DIR }}/build"
