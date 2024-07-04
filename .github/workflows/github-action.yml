@@ -1,56 +1,68 @@
-name: CI/CD Pipeline
+name: CI/CD
 
 on:
   push:
     branches:
       - main
-
 env:
   SSH_USER: ubuntu
-  SSH_HOST: 44.201.244.211
+  SSH_HOST: 3.80.209.201
   DEPLOY_DIR: /home/ubuntu/prod
   BACKUP_DIR: /home/ubuntu/backup
   SERVE_PORT: 3000
 
 jobs:
-  build-and-deploy:
+  build:
     runs-on: ubuntu-latest
-
-    env:
-      SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-      BUILD_NUMBER: ${{ github.run_id }}
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v2
 
-      - name: Set up SSH
-        run: |
-          sudo apt-get update -y
-          sudo apt-get install openssh-client -y
-          eval $(ssh-agent -s)
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" | tr -d '\r' | ssh-add -
-          mkdir -p ~/.ssh
-          chmod 700 ~/.ssh
-          ssh-keyscan ${{ env.SSH_HOST }} >> ~/.ssh/known_hosts
-
-      - name: Backup and clear deployment directory on server
-        run: |
-          ssh ${{ env.SSH_USER }}@${{ env.SSH_HOST }} "mkdir -p ${{ env.BACKUP_DIR }}/build_${{ env.BUILD_NUMBER }} && mv ${{ env.DEPLOY_DIR }}/build ${{ env.BACKUP_DIR }}/build_${{ env.BUILD_NUMBER }} && rm -rf ${{ env.DEPLOY_DIR }}/build"
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '14'
 
       - name: Install dependencies
         run: npm install
 
-      - name: Build the project
+      - name: Build project
         run: npm run build
 
-      - name: Deploy to server
-        run: scp -r build ${{ env.SSH_USER }}@${{ env.SSH_HOST }}:${{ env.DEPLOY_DIR }}
+      - name: Save build artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: build
+          path: build/
 
-      - name: Start server
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+
+    steps:
+      - name: Download build artifacts
+        uses: actions/download-artifact@v2
+        with:
+          name: build
+          path: build/
+
+      - name: Set up SSH
+        uses: webfactory/ssh-agent@v0.5.3
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Move previous build to backup and clean deploy directory
+        run: ssh $SSH_USER@$SSH_HOST "mv $DEPLOY_DIR/build $BACKUP_DIR && rm -rf $DEPLOY_DIR/build"
+
+      - name: Copy build artifacts to server
+        run: scp -r build $SSH_USER@$SSH_HOST:$DEPLOY_DIR
+
+      - name: Install serve and start application
         run: |
-          ssh ${{ env.SSH_USER }}@${{ env.SSH_HOST }} "
-            cd ${{ env.DEPLOY_DIR }}/build &&
+          ssh $SSH_USER@$SSH_HOST "
+            cd $DEPLOY_DIR/build &&
             npm install serve &&
-            tmux new-session -d -s serve_session './node_modules/.bin/serve -s . -p ${{ env.SERVE_PORT }}'
+            tmux new-session -d -s serve_session 
+            './node_modules/.bin/serve -s . -p $SERVE_PORT'
           "
