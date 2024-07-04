@@ -36,9 +36,9 @@ jobs:
           username: $EC2_USERNAME
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            ssh -o StrictHostKeyChecking=no $EC2_USERNAME@$EC2_HOST 'mkdir -p $DEPLOY_DIR'
-            scp -r -o StrictHostKeyChecking=no build/* $EC2_USERNAME@$EC2_HOST:$DEPLOY_DIR
+            ssh -o StrictHostKeyChecking=no ubuntu@ip-172-31-84-241 'mkdir -p $DEPLOY_DIR'
+            scp -r -o StrictHostKeyChecking=no build/* ubuntu@ip-172-31-84-241:$DEPLOY_DIR
 
             # Restart your service (assuming using PM2)
-            ssh -o StrictHostKeyChecking=no $EC2_USERNAME@$EC2_HOST 'pm2 restart my-app'
+            ssh -o StrictHostKeyChecking=no ubuntu@ip-172-31-84-241 'pm2 restart my-app'
 
