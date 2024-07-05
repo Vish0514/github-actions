@@ -35,6 +35,6 @@ jobs:
             pwd
             cd prod/build
             pwd
-            npm install
-            npm start
+            npm install serve
+            tmux new-session -d -s serve_session './node_modules/.bin/serve -s .'
 
