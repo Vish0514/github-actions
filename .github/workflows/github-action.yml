@@ -28,8 +28,8 @@ jobs:
     - name: Backup and Start Application
       uses: appleboy/ssh-action@v0.1.5
       env:
-        DEPLOY_DIR: /home/ubuntu/prod/
-        BACKUP_DIR: /home/ubuntu/backup/
+        DEPLOY_DIR: "/home/ubuntu/prod/"
+        BACKUP_DIR: "/home/ubuntu/backup/"
       with:
         host: 3.92.216.148
         username: ubuntu
