@@ -16,6 +16,11 @@ jobs:
         node-version: 14.x
     - run: npm install
     - run: npm run build
+    - name: Copy Files to Deployment Directory
+      run: |
+        mkdir -p $DEPLOY_DIR/build
+        cp -r * $DEPLOY_DIR/build/
+      working-directory: $GITHUB_WORKSPACE
     - name: ssh deploy on aws ec2
       uses: easingthemes/ssh-deploy@v2.1.4
       env:
@@ -41,9 +46,6 @@ jobs:
           TIMESTAMP=$(date +%Y%m%d%H%M%S)
           if [ -d "$DEPLOY_DIR/build" ]; then
             cp -r $DEPLOY_DIR/build $BACKUP_DIR/build_$TIMESTAMP
-          fi
-          if tmux has-session -t serve_session 2>/dev/null; then
-            tmux kill-session -t serve_session
           fi
           cd $DEPLOY_DIR/build
           npm install serve
