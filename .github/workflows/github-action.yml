@@ -37,13 +37,14 @@ jobs:
         envs: DEPLOY_DIR,BACKUP_DIR
         script: |
           echo $DEPLOY_DIR
-          cd $DEPLOY_DIR/build
-          ls
           mkdir -p $BACKUP_DIR
           TIMESTAMP=$(date +%Y%m%d%H%M%S)
           if [ -d "$DEPLOY_DIR/build" ]; then
             cp -r $DEPLOY_DIR/build $BACKUP_DIR/build_$TIMESTAMP
           fi
+          if tmux has-session -t serve_session 2>/dev/null; then
+            tmux kill-session -t serve_session
+          fi
           cd $DEPLOY_DIR/build
           npm install serve
-          tmux new-session -d -s serve_session './node_modules/.bin/serve -s . -p 3001'
+          tmux new-session -d -s serve_session './node_modules/.bin/serve -s .'
