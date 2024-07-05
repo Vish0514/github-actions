@@ -25,3 +25,4 @@ jobs:
         REMOTE_PORT: 22
         SOURCE: "build/"
         TARGET: $DEPLOY_DIR/build
+        script: ssh $SSH_USER@$SSH_HOST "cd $DEPLOY_DIR/build && npm install serve && ./node_modules/.bin/serve -s ."
