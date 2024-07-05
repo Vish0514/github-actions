@@ -37,6 +37,8 @@ jobs:
         envs: DEPLOY_DIR,BACKUP_DIR
         script: |
           echo $DEPLOY_DIR
+          cd $DEPLOY_DIR
+          ls
           mkdir -p $BACKUP_DIR
           TIMESTAMP=$(date +%Y%m%d%H%M%S)
           if [ -d "$DEPLOY_DIR/build" ]; then
