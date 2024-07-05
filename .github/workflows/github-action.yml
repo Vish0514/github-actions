@@ -33,7 +33,7 @@ jobs:
           key: ${{ secrets.AWS_SECRET_KEY }}
           script: |
             pwd
-            cd $DEPLOY_DIR
+            cd prod/build
             pwd
             npm install
             npm start
