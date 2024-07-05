@@ -3,7 +3,7 @@ on:
     branches: main
 
 env:
-  DEPLOY_DIR: /home/ubuntu/prod/
+  DEPLOY_DIR: /home/ubuntu/prod
 
 jobs:
   build-and-deploy:
@@ -16,11 +16,6 @@ jobs:
         node-version: 14.x
     - run: npm install
     - run: npm run build
-    - name: Copy Files to Deployment Directory
-      run: |
-        mkdir -p $DEPLOY_DIR/build
-        cp -r * $DEPLOY_DIR/build/
-      working-directory: $GITHUB_WORKSPACE
     - name: ssh deploy on aws ec2
       uses: easingthemes/ssh-deploy@v2.1.4
       env:
@@ -33,8 +28,8 @@ jobs:
     - name: Backup and Start Application
       uses: appleboy/ssh-action@v1.0.3
       env:
-        DEPLOY_DIR: "/home/ubuntu/prod"
-        BACKUP_DIR: "/home/ubuntu/backup"
+        DEPLOY_DIR: /home/ubuntu/prod
+        BACKUP_DIR: /home/ubuntu/backup
       with:
         host: 3.92.216.148
         username: ubuntu
