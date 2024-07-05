@@ -3,7 +3,7 @@ on:
     branches: main
 
 env:
-  DEPLOY_DIR: /home/ubuntu/prod/
+  DEPLOY_DIR: /home/ubuntu/prod
 
 jobs:
   build-and-deploy:
@@ -42,7 +42,7 @@ jobs:
           mkdir -p $BACKUP_DIR
           TIMESTAMP=$(date +%Y%m%d%H%M%S)
           if [ -d "$DEPLOY_DIR/build" ]; then
-            mv $DEPLOY_DIR/build $BACKUP_DIR/build_$TIMESTAMP
+            cp -r $DEPLOY_DIR/build $BACKUP_DIR/build_$TIMESTAMP
           fi
           if tmux has-session -t serve_session 2>/dev/null; then
             tmux kill-session -t serve_session
