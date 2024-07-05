@@ -24,4 +24,4 @@ jobs:
         REMOTE_USER: ubuntu
         REMOTE_PORT: 22
         SOURCE: "build/"
-        TARGET: $DEPLOY_DIR
+        TARGET: $DEPLOY_DIR/build
