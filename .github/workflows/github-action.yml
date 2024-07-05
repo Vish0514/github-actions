@@ -32,9 +32,10 @@ jobs:
           username: ubuntu
           key: ${{ secrets.AWS_SECRET_KEY }}
           script: |
-            pwd
+            if tmux has-session -t serve_session 2>/dev/null; then
+              tmux kill-session -t serve_session
+            fi
             cd prod/build
-            pwd
             npm install serve
             tmux new-session -d -s serve_session './node_modules/.bin/serve -s .'
 
