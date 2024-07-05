@@ -25,6 +25,13 @@ jobs:
         REMOTE_PORT: 22
         SOURCE: "build/"
         TARGET: $DEPLOY_DIR/build
-        script: |
-          cd $DEPLOY_DIR/build
-          npm start
+    - name: Start Application
+      uses: appleboy/ssh-action@v0.1.5
+      with:
+          host: 3.92.216.148
+          username: ubuntu
+          key: ${{ secrets.AWS_SECRET_KEY }}
+          script: |
+            cd $DEPLOY_DIR/build
+            npm start
+
