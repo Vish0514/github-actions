@@ -17,23 +17,10 @@ jobs:
         node-version: 14.x
     - run: npm install
     - run: CI=false npm run build
-    - name: ssh deploy on aws ec2
-      uses: easingthemes/ssh-deploy@v2.1.4
-      env:
-        SSH_PRIVATE_KEY: ${{ secrets.AWS_SECRET_KEY }}
-        REMOTE_HOST: 3.92.216.148
-        REMOTE_USER: ubuntu
-        REMOTE_PORT: 22
-        SOURCE: "build/"
-        TARGET: $DEPLOY_DIR/build
     - name: Backup and Start Application
-      uses: appleboy/ssh-action@v0.1.5
-      with:
-        host: 3.92.216.148
-        username: ubuntu
-        key: ${{ secrets.AWS_SECRET_KEY }}
-        script: |
-          mkdir -p $BACKUP_DIR
+      run: |
+        ssh -i ${{ secrets.AWS_SECRET_KEY }} ubuntu@3.92.216.148 '
+          mkdir -p $DEPLOY_DIR
           TIMESTAMP=$(date +%Y%m%d%H%M%S)
           if [ -d "$DEPLOY_DIR/build" ]; then
             mv $DEPLOY_DIR/build $BACKUP_DIR/build_$TIMESTAMP
@@ -41,6 +28,7 @@ jobs:
           if tmux has-session -t serve_session 2>/dev/null; then
             tmux kill-session -t serve_session
           fi
-          cd $DEPLOY_DIR/build
+          cd $DEPLOY_DIR
           npm install serve
           tmux new-session -d -s serve_session './node_modules/.bin/serve -s .'
+        '
