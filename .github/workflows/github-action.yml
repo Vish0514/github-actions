@@ -3,7 +3,7 @@ on:
     branches: main
 
 env:
-  DEPLOY_DIR: /home/ubuntu/prod
+  DEPLOY_DIR: /home/ubuntu/prod/
 
 jobs:
   build-and-deploy:
@@ -15,7 +15,7 @@ jobs:
       with:
         node-version: 14.x
     - run: npm install
-    - run: CI=false npm run build
+    - run: npm run build
     - name: ssh deploy on aws ec2
       uses: easingthemes/ssh-deploy@v2.1.4
       env:
@@ -37,7 +37,7 @@ jobs:
         envs: DEPLOY_DIR,BACKUP_DIR
         script: |
           echo $DEPLOY_DIR
-          cd $DEPLOY_DIR
+          cd $DEPLOY_DIR/build
           ls
           mkdir -p $BACKUP_DIR
           TIMESTAMP=$(date +%Y%m%d%H%M%S)
