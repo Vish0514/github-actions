@@ -32,6 +32,7 @@ jobs:
           username: ubuntu
           key: ${{ secrets.AWS_SECRET_KEY }}
           script: |
+            pwd
             cd $DEPLOY_DIR/build
             npm start
 
