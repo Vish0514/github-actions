@@ -4,6 +4,7 @@ on:
 
 env:
   DEPLOY_DIR: /home/ubuntu/prod/
+  BACKUP_DIR: /home/ubuntu/backup/
 
 jobs:
   build-and-deploy:
@@ -25,17 +26,21 @@ jobs:
         REMOTE_PORT: 22
         SOURCE: "build/"
         TARGET: $DEPLOY_DIR/build
-    - name: Start Application
+    - name: Backup and Start Application
       uses: appleboy/ssh-action@v0.1.5
       with:
-          host: 3.92.216.148
-          username: ubuntu
-          key: ${{ secrets.AWS_SECRET_KEY }}
-          script: |
-            if tmux has-session -t serve_session 2>/dev/null; then
-              tmux kill-session -t serve_session
-            fi
-            cd prod/build
-            npm install serve
-            tmux new-session -d -s serve_session './node_modules/.bin/serve -s .'
-
+        host: 3.92.216.148
+        username: ubuntu
+        key: ${{ secrets.AWS_SECRET_KEY }}
+        script: |
+          mkdir -p $BACKUP_DIR
+          TIMESTAMP=$(date +%Y%m%d%H%M%S)
+          if [ -d "$DEPLOY_DIR/build" ]; then
+            mv $DEPLOY_DIR/build $BACKUP_DIR/build_$TIMESTAMP
+          fi
+          if tmux has-session -t serve_session 2>/dev/null; then
+            tmux kill-session -t serve_session
+          fi
+          cd $DEPLOY_DIR/build
+          npm install serve
+          tmux new-session -d -s serve_session './node_modules/.bin/serve -s .'
