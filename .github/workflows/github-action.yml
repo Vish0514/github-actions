@@ -20,7 +20,7 @@ jobs:
       uses: easingthemes/ssh-deploy@v2.1.4
       env:
         SSH_PRIVATE_KEY: ${{ secrets.AWS_SECRET_KEY }}
-        REMOTE_HOST: 54.166.0.122
+        REMOTE_HOST: 3.25.109.27
         REMOTE_USER: ubuntu
         REMOTE_PORT: 22
         SOURCE: "build/"
