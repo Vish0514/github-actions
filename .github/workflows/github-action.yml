@@ -31,7 +31,7 @@ jobs:
         DEPLOY_DIR: /home/ubuntu/prod
         BACKUP_DIR: /home/ubuntu/backup
       with:
-        host: 54.166.0.122
+        host: 3.25.109.27
         username: ubuntu
         key: ${{ secrets.AWS_SECRET_KEY }}
         envs: DEPLOY_DIR,BACKUP_DIR
